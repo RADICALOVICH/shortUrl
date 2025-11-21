@@ -1,0 +1,18 @@
+# === ОС (macOS) ===
+.DS_Store
+
+# === IntelliJ IDEA ===
+.idea/
+*.iml
+
+# === Maven ===
+target/
+
+# === Eclipse/NetBeans/прочие (на всякий случай) ===
+*.class
+*.log
+out/
+
+# === Конфиги/секреты (если появятся) ===
+*.env
+*.local
