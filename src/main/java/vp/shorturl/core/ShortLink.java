@@ -31,7 +31,7 @@ public class ShortLink {
     }
 
     public String getUrl() {
-        if (LocalDateTime.now().isAfter(expiredAt) || (this.usagesCount >= this.maxUsages)){
+        if (LocalDateTime.now().isAfter(expiredAt) || (this.usagesCount >= this.maxUsages)) {
             throw new IllegalStateException("You've reached your limit or time is over");
         }
         usagesCount++;
@@ -43,9 +43,9 @@ public class ShortLink {
     }
 
     public void setExpiredAt(LocalDateTime expiredAt) {
-        if (expiredAt.isBefore(LocalDateTime.now())){throw new IllegalStateException("Expire date must be greater than now");}
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Expire date must be greater than now");
+        }
         this.expiredAt = expiredAt;
     }
-
-
 }
