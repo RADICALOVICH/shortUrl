@@ -1,5 +1,7 @@
 package vp.shorturl.core;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,8 +18,55 @@ public class ShortLinkService {
             int maxUsages,
             int expirationHours
     ) {
-        ShortLink link = new ShortLink(url, "hello", ownerId, maxUsages, expirationHours);
+        String shortId = generateRandomShortId();
+        ShortLink link = new ShortLink(url, shortId, ownerId, maxUsages, expirationHours);
         return shortLinkRepository.save(link);
+    }
+
+    public String openShortLink(String shortId){
+        ShortLink shortLink = shortLinkRepository.findByShortId(shortId)
+                .orElseThrow(() -> new IllegalStateException("Short link not found"));
+        return shortLink.getUrl();
+    }
+
+    // Редактирование лимита владельцем
+    public void updateMaxUsages(UUID ownerId, String shortId, int newMaxUsages) {
+        ShortLink link = shortLinkRepository.findByShortId(shortId)
+                .orElseThrow(() -> new IllegalStateException("Short link not found"));
+
+        if (!link.getOwnerId().equals(ownerId)) {
+            throw new IllegalStateException("You are not the owner of this link");
+        }
+
+        link.setMaxUsages(newMaxUsages);
+        shortLinkRepository.save(link);
+    }
+
+    public void updateExpiration(UUID ownerId, String shortId, LocalDateTime newExpiredAt) {
+        ShortLink link = shortLinkRepository.findByShortId(shortId)
+                .orElseThrow(() -> new IllegalStateException("Short link not found"));
+
+        if (!link.getOwnerId().equals(ownerId)) {
+            throw new IllegalStateException("You are not the owner of this link");
+        }
+
+        link.setExpiredAt(newExpiredAt);
+        shortLinkRepository.save(link);
+    }
+
+    public void deleteShortLink(UUID ownerId, String shortId) {
+        ShortLink link = shortLinkRepository.findByShortId(shortId)
+                .orElseThrow(() -> new IllegalStateException("Short link not found"));
+
+        if (!link.getOwnerId().equals(ownerId)) {
+            throw new IllegalStateException("You are not the owner of this link");
+        }
+
+        shortLinkRepository.deleteByShortId(shortId);
+    }
+
+    public List<ShortLink> getLinksByOwner(UUID ownerId) {
+        return shortLinkRepository.findByOwnerId(ownerId);
     }
 
     private String generateUniqueShortId() {
