@@ -1,5 +1,8 @@
 package vp.shorturl.app;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 
 import vp.shorturl.core.ShortLink;
 import vp.shorturl.core.ShortLinkService;
@@ -23,12 +26,13 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         User currentUser = null;
 
-        printMenu();
         while (true){
+            printMenu();
             String option = scanner.nextLine();
             switch(option){
                 case "1" -> currentUser = handleCreateUser(userService);
                 case "2" -> currentUser = handleLogin(userService, scanner);
+                case "3" -> handleCreateShortLink(shortLinkService, currentUser,scanner);
                 case "0" -> {
                     System.out.println("Goodbye!");
                     return;
@@ -80,5 +84,70 @@ public class Main {
             return null;
         }
     }
+
+    public static void handleCreateShortLink(ShortLinkService shortLinkService, User currentUser, Scanner scanner) {
+        if (currentUser == null) {
+            System.out.println("You must be logged in to create a short link.");
+            return;
+        }
+
+        System.out.println("Enter original URL:");
+        String url = scanner.nextLine();
+
+        if (!isValidUrl(url)) {
+            System.out.println("Invalid URL. Please enter a valid http/https URL.");
+            return;
+        }
+
+        System.out.println("Enter max usages (integer > 0):");
+        String maxUsagesInput = scanner.nextLine();
+        int maxUsages;
+        try {
+            maxUsages = Integer.parseInt(maxUsagesInput);
+            if (maxUsages <= 0) {
+                System.out.println("Max usages must be greater than 0.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number for max usages.");
+            return;
+        }
+
+        System.out.println("Enter expiration time in hours (integer > 0):");
+        String expirationInput = scanner.nextLine();
+        int expirationHours;
+        try {
+            expirationHours = Integer.parseInt(expirationInput);
+            if (expirationHours <= 0) {
+                System.out.println("Expiration hours must be greater than 0.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number for expiration hours.");
+            return;
+        }
+
+        ShortLink link = shortLinkService.createShortLink(
+                currentUser.getUuid(),
+                url,
+                maxUsages,
+                expirationHours
+        );
+
+        System.out.println("Short link created. ID: " + link.getShortId());
+    }
+
+    private static boolean isValidUrl(String url) {
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            return scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"));
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+
+
 
 }
