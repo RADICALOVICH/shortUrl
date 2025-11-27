@@ -1,15 +1,16 @@
 package vp.shorturl.app;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-import vp.shorturl.core.ShortLink;
-import vp.shorturl.core.ShortLinkService;
-import vp.shorturl.core.User;
-import vp.shorturl.core.UserService;
+import vp.shorturl.core.*;
 import vp.shorturl.infra.InMemoryShortLinkRepository;
 import vp.shorturl.infra.InMemoryUserRepository;
+
 
 import java.util.Optional;
 import java.util.Scanner;
@@ -32,7 +33,9 @@ public class Main {
             switch(option){
                 case "1" -> currentUser = handleCreateUser(userService);
                 case "2" -> currentUser = handleLogin(userService, scanner);
-                case "3" -> handleCreateShortLink(shortLinkService, currentUser,scanner);
+                case "3" -> handleCreateShortLink(shortLinkService, currentUser, scanner);
+                case "4" -> handleOpenShortLink(shortLinkService, scanner);
+                case "5" -> handleListMyLinks(shortLinkService,currentUser,scanner);
                 case "0" -> {
                     System.out.println("Goodbye!");
                     return;
@@ -137,6 +140,43 @@ public class Main {
         System.out.println("Short link created. ID: " + link.getShortId());
     }
 
+    private static void handleOpenShortLink(ShortLinkService shortLinkService, Scanner scanner) {
+        System.out.println("Enter shorl link ID: ");
+        String shortId = scanner.nextLine().trim();
+        try {
+            String url = shortLinkService.openShortLink(shortId);
+            System.out.println("Opening: " + url);
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(new URI(url));
+            } else {
+                System.out.println("Desktop browsing is not supported on this system.");
+            }
+        } catch (IllegalStateException e) {
+            System.out.println("Cannot open link: " + e.getMessage());
+        } catch (IOException | URISyntaxException e) {
+            System.out.println("Failed to open in browser: " + e.getMessage());
+        }
+    }
+
+    private static void handleListMyLinks(ShortLinkService shortLinkService, User currentUser, Scanner scanner){
+        if (currentUser == null) {
+            System.out.println("You must be logged in to view your links");
+            return;
+        }
+
+        var links = shortLinkService.getLinksByOwner(currentUser.getUuid());
+
+        if (links.isEmpty()){
+            System.out.println("You don't have any links yet.");
+            return;
+        }
+        System.out.println("Your links: ");
+        for (ShortLink link : links) {
+            System.out.println("- " + link.getShortId());
+        }
+
+    }
+
     private static boolean isValidUrl(String url) {
         try {
             URI uri = new URI(url);
@@ -146,6 +186,10 @@ public class Main {
             return false;
         }
     }
+
+
+
+
 
 
 
