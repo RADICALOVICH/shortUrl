@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
+import vp.shorturl.config.AppConfig;
 import vp.shorturl.core.*;
 import vp.shorturl.infra.InMemoryShortLinkRepository;
 import vp.shorturl.infra.InMemoryUserRepository;
@@ -18,6 +19,8 @@ import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
+        AppConfig config = new AppConfig();
+
         InMemoryUserRepository userRepository = new InMemoryUserRepository();
         InMemoryShortLinkRepository shortLinkRepository = new InMemoryShortLinkRepository();
 
@@ -33,7 +36,7 @@ public class Main {
             switch(option){
                 case "1" -> currentUser = handleCreateUser(userService);
                 case "2" -> currentUser = handleLogin(userService, scanner);
-                case "3" -> handleCreateShortLink(shortLinkService, currentUser, scanner);
+                case "3" -> handleCreateShortLink(shortLinkService,config.getDefaultMaxUsages(), config.getDefaultTtlHours(), currentUser, scanner);
                 case "4" -> handleOpenShortLink(shortLinkService, scanner);
                 case "5" -> handleListMyLinks(shortLinkService,currentUser,scanner);
                 case "0" -> {
@@ -88,7 +91,7 @@ public class Main {
         }
     }
 
-    public static void handleCreateShortLink(ShortLinkService shortLinkService, User currentUser, Scanner scanner) {
+    public static void handleCreateShortLink(ShortLinkService shortLinkService, int defaultMaxUsages, int defaultTTLHours, User currentUser, Scanner scanner) {
         if (currentUser == null) {
             System.out.println("You must be logged in to create a short link.");
             return;
@@ -102,39 +105,11 @@ public class Main {
             return;
         }
 
-        System.out.println("Enter max usages (integer > 0):");
-        String maxUsagesInput = scanner.nextLine();
-        int maxUsages;
-        try {
-            maxUsages = Integer.parseInt(maxUsagesInput);
-            if (maxUsages <= 0) {
-                System.out.println("Max usages must be greater than 0.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid number for max usages.");
-            return;
-        }
-
-        System.out.println("Enter expiration time in hours (integer > 0):");
-        String expirationInput = scanner.nextLine();
-        int expirationHours;
-        try {
-            expirationHours = Integer.parseInt(expirationInput);
-            if (expirationHours <= 0) {
-                System.out.println("Expiration hours must be greater than 0.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid number for expiration hours.");
-            return;
-        }
-
         ShortLink link = shortLinkService.createShortLink(
                 currentUser.getUuid(),
                 url,
-                maxUsages,
-                expirationHours
+                defaultMaxUsages,
+                defaultTTLHours
         );
 
         System.out.println("Short link created. ID: " + link.getShortId());
@@ -186,12 +161,5 @@ public class Main {
             return false;
         }
     }
-
-
-
-
-
-
-
 
 }
