@@ -10,7 +10,10 @@ public interface ShortLinkRepository {
 
     Optional<ShortLink> findByShortId(String shortId);
 
+    List<ShortLink> findAll();
+
     List<ShortLink> findByOwnerId(UUID ownerId);
 
     void deleteByShortId(String shortId);
+
 }

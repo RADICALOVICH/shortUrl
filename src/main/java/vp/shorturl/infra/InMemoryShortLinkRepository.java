@@ -25,6 +25,11 @@ public class InMemoryShortLinkRepository implements ShortLinkRepository {
     }
 
     @Override
+    public List<ShortLink> findAll() {
+        return new ArrayList<>(links.values());
+    }
+
+    @Override
     public List<ShortLink> findByOwnerId(UUID ownerId) {
         List<ShortLink> result = new ArrayList<>();
 
