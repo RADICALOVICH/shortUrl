@@ -13,6 +13,8 @@ import vp.shorturl.infra.InMemoryShortLinkRepository;
 import vp.shorturl.infra.InMemoryUserRepository;
 
 
+import javax.sound.midi.Soundbank;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
@@ -38,7 +40,10 @@ public class Main {
                 case "2" -> currentUser = handleLogin(userService, scanner);
                 case "3" -> handleCreateShortLink(shortLinkService,config.getDefaultMaxUsages(), config.getDefaultTtlHours(), currentUser, scanner);
                 case "4" -> handleOpenShortLink(shortLinkService, scanner);
-                case "5" -> handleListMyLinks(shortLinkService,currentUser,scanner);
+                case "5" -> handleListMyLinks(shortLinkService, currentUser, scanner);
+                case "6" -> handleUpdateMaxUsages(currentUser,shortLinkService, scanner);
+                case "7" -> handleUpdateExpiration(currentUser, shortLinkService, scanner);
+                case "8" -> handleDeleteShortLink(currentUser, shortLinkService, scanner);
                 case "0" -> {
                     System.out.println("Goodbye!");
                     return;
@@ -50,6 +55,40 @@ public class Main {
 
     }
 
+    public static void handleUpdateExpiration(User currentUser, ShortLinkService shortLinkService, Scanner scanner) {
+        if (currentUser == null) {
+            System.out.println("You must be logged in to update link expiration.");
+            return;
+        }
+
+        System.out.print("Enter short link ID: ");
+        String shortId = scanner.nextLine().trim();
+
+        System.out.print("Enter new expiration in hours from now (integer > 0): ");
+        int hours;
+        try {
+            hours = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number format.");
+            return;
+        }
+
+        if (hours <= 0) {
+            System.out.println("Expiration hours must be greater than 0.");
+            return;
+        }
+
+        LocalDateTime newExpiration = LocalDateTime.now().plusHours(hours);
+
+        try {
+            shortLinkService.updateExpiration(currentUser.getUuid(), shortId, newExpiration);
+            System.out.println("Expiration updated successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println("Failed to update expiration: " + e.getMessage());
+        }
+    }
+
+
     private static void printMenu() {
         System.out.println("==== Short URL Service ====");
         System.out.println("1. Create new user");
@@ -57,6 +96,9 @@ public class Main {
         System.out.println("3. Create short link");
         System.out.println("4. Open short link");
         System.out.println("5. List my links");
+        System.out.println("6. Update link max usages count");
+        System.out.println("7. Update link expiration time");
+        System.out.println("8. Delete link");
         System.out.println("0. Exit");
         System.out.print("Choose an option: ");
     }
@@ -116,7 +158,7 @@ public class Main {
     }
 
     private static void handleOpenShortLink(ShortLinkService shortLinkService, Scanner scanner) {
-        System.out.println("Enter shorl link ID: ");
+        System.out.println("Enter short link ID: ");
         String shortId = scanner.nextLine().trim();
         try {
             String url = shortLinkService.openShortLink(shortId);
@@ -151,6 +193,61 @@ public class Main {
         }
 
     }
+
+    public static void handleUpdateMaxUsages(User currentUser, ShortLinkService shortLinkService, Scanner scanner) {
+        if (currentUser == null) {
+            System.out.println("You must be logged in to update max usages of the link.");
+            return;
+        }
+
+        System.out.print("Enter short link ID: ");
+        String shortId = scanner.nextLine().trim();
+
+        System.out.print("Enter new max usages (integer > 0): ");
+        int maxUsages;
+        try {
+            maxUsages = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number format.");
+            return;
+        }
+
+        if (maxUsages <= 0) {
+            System.out.println("Max usages must be greater than 0.");
+            return;
+        }
+
+        try {
+            shortLinkService.updateMaxUsages(currentUser.getUuid(), shortId, maxUsages);
+            System.out.println("Max usages for the link updated successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println("Failed to update max usages: " + e.getMessage());
+        }
+    }
+
+    public static void handleDeleteShortLink(User currentUser, ShortLinkService shortLinkService, Scanner scanner) {
+        if (currentUser == null) {
+            System.out.println("You must be logged in to delete a link.");
+            return;
+        }
+
+        System.out.print("Enter short link ID: ");
+        String shortId = scanner.nextLine().trim();
+
+        if (shortId.isEmpty()) {
+            System.out.println("Short link ID cannot be empty.");
+            return;
+        }
+
+        try {
+            shortLinkService.deleteShortLink(currentUser.getUuid(), shortId);
+            System.out.println("Link deleted successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println("Failed to delete link: " + e.getMessage());
+        }
+    }
+
+
 
     private static boolean isValidUrl(String url) {
         try {

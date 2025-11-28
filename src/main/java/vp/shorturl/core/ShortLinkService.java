@@ -18,7 +18,7 @@ public class ShortLinkService {
             int maxUsages,
             int expirationHours
     ) {
-        String shortId = generateRandomShortId();
+        String shortId = generateUniqueShortId();
         ShortLink link = new ShortLink(url, shortId, ownerId, maxUsages, expirationHours);
         return shortLinkRepository.save(link);
     }
