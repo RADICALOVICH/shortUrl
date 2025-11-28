@@ -2,7 +2,6 @@ package vp.shorturl.app;
 
 import java.awt.*;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -12,8 +11,6 @@ import vp.shorturl.core.*;
 import vp.shorturl.infra.InMemoryShortLinkRepository;
 import vp.shorturl.infra.InMemoryUserRepository;
 
-
-import javax.sound.midi.Soundbank;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Scanner;
@@ -33,6 +30,7 @@ public class Main {
         User currentUser = null;
 
         while (true){
+            shortLinkService.removeExpiredLinks();
             printMenu();
             String option = scanner.nextLine();
             switch(option){

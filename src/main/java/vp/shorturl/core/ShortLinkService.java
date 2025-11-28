@@ -69,6 +69,16 @@ public class ShortLinkService {
         return shortLinkRepository.findByOwnerId(ownerId);
     }
 
+    public void removeExpiredLinks() {
+        List<ShortLink> allLinks = shortLinkRepository.findAll();
+
+        for (ShortLink link : allLinks) {
+            if (link.isExpired()) {
+                shortLinkRepository.deleteByShortId(link.getShortId());
+            }
+        }
+    }
+
     private String generateUniqueShortId() {
         String id;
         do {
