@@ -22,7 +22,7 @@ A command-line application for creating and managing short URLs with expiration 
 1. Clone the repository:
 ```bash
 git clone https://github.com/RADICALOVICH/shortUrl.git
-cd short-url
+cd shortUrl
 ```
 
 2. Build the project:
