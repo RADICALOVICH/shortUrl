@@ -14,8 +14,8 @@ public class InMemoryShortLinkRepository implements ShortLinkRepository {
 
     @Override
     public ShortLink save(ShortLink link) {
-       links.put(link.getShortId(), link);
-       return link;
+        links.put(link.getShortId(), link);
+        return link;
     }
 
     @Override
@@ -32,8 +32,8 @@ public class InMemoryShortLinkRepository implements ShortLinkRepository {
     public List<ShortLink> findByOwnerId(UUID ownerId) {
         List<ShortLink> result = new ArrayList<>();
 
-        for (ShortLink link : links.values()){
-            if (link.getOwnerId().equals(ownerId)){
+        for (ShortLink link : links.values()) {
+            if (link.getOwnerId().equals(ownerId)) {
                 result.add(link);
             }
         }
