@@ -38,10 +38,11 @@ public class Main {
                 case "2" -> currentUser = handleLogin(userService, scanner);
                 case "3" -> handleCreateShortLink(shortLinkService,config.getDefaultMaxUsages(), config.getDefaultTtlHours(), currentUser, scanner);
                 case "4" -> handleOpenShortLink(shortLinkService, scanner);
-                case "5" -> handleListMyLinks(shortLinkService, currentUser, scanner);
+                case "5" -> handleListMyLinks(shortLinkService, currentUser);
                 case "6" -> handleUpdateMaxUsages(currentUser,shortLinkService, scanner);
                 case "7" -> handleUpdateExpiration(currentUser, shortLinkService, scanner);
                 case "8" -> handleDeleteShortLink(currentUser, shortLinkService, scanner);
+                case "9", "h", "help" -> printHelp(scanner);
                 case "0" -> {
                     System.out.println("Goodbye!");
                     return;
@@ -97,8 +98,62 @@ public class Main {
         System.out.println("6. Update link max usages count");
         System.out.println("7. Update link expiration time");
         System.out.println("8. Delete link");
+        System.out.println("9. Help / Usage examples");
         System.out.println("0. Exit");
         System.out.print("Choose an option: ");
+    }
+
+    private static void printHelp(Scanner scanner) {
+        System.out.println("\n=== Help & Usage Examples ===");
+        System.out.println();
+        System.out.println("QUICK START:");
+        System.out.println("1. Create a new user (option 1) - you'll get a UUID, save it!");
+        System.out.println("2. Login with your UUID (option 2)");
+        System.out.println("3. Create a short link (option 3)");
+        System.out.println("4. Share the short ID or open it (option 4)");
+        System.out.println();
+        System.out.println("DETAILED EXAMPLES:");
+        System.out.println();
+        System.out.println("Creating a user:");
+        System.out.println("  > Choose option 1");
+        System.out.println("  > Save the displayed UUID (e.g., 550e8400-e29b-41d4-a716-446655440000)");
+        System.out.println();
+        System.out.println("Logging in:");
+        System.out.println("  > Choose option 2");
+        System.out.println("  > Enter your UUID: 550e8400-e29b-41d4-a716-446655440000");
+        System.out.println();
+        System.out.println("Creating a short link:");
+        System.out.println("  > Choose option 3 (must be logged in)");
+        System.out.println("  > Enter URL: https://example.com");
+        System.out.println("  > You'll get a short ID (e.g., aB3dEf9K)");
+        AppConfig config = new AppConfig();
+        System.out.println("  > Default: " + config.getDefaultMaxUsages() + " max usages, " +
+                          config.getDefaultTtlHours() + " hours TTL");
+        System.out.println();
+        System.out.println("Opening a link:");
+        System.out.println("  > Choose option 4");
+        System.out.println("  > Enter short ID: aB3dEf9K");
+        System.out.println("  > Link opens in your browser (if supported)");
+        System.out.println();
+        System.out.println("Updating max usages:");
+        System.out.println("  > Choose option 6 (must be logged in)");
+        System.out.println("  > Enter short ID: aB3dEf9K");
+        System.out.println("  > Enter new max usages: 10");
+        System.out.println();
+        System.out.println("Updating expiration:");
+        System.out.println("  > Choose option 7 (must be logged in)");
+        System.out.println("  > Enter short ID: aB3dEf9K");
+        System.out.println("  > Enter hours from now: 48");
+        System.out.println();
+        System.out.println("IMPORTANT NOTES:");
+        System.out.println("  • Links expire after TTL (time-to-live)");
+        System.out.println("  • Links stop working after reaching max usages");
+        System.out.println("  • Only the link owner can update/delete their links");
+        System.out.println("  • Expired links are automatically removed");
+        System.out.println("  • URLs must start with http:// or https://");
+        System.out.println();
+        System.out.print("Press Enter to continue...");
+        scanner.nextLine();
     }
 
     private static User handleCreateUser(UserService userService) {
@@ -173,7 +228,7 @@ public class Main {
         }
     }
 
-    private static void handleListMyLinks(ShortLinkService shortLinkService, User currentUser, Scanner scanner){
+    private static void handleListMyLinks(ShortLinkService shortLinkService, User currentUser){
         if (currentUser == null) {
             System.out.println("You must be logged in to view your links");
             return;
