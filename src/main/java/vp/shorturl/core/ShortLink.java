@@ -31,8 +31,11 @@ public class ShortLink {
     }
 
     public String getUrl() {
-        if (LocalDateTime.now().isAfter(expiredAt) || (this.usagesCount >= this.maxUsages)) {
-            throw new IllegalStateException("You've reached your limit or time is over");
+        if (LocalDateTime.now().isAfter(expiredAt)) {
+            throw new IllegalStateException("Link expired");
+        }
+        if (this.usagesCount >= this.maxUsages) {
+            throw new IllegalStateException("Usage limit reached");
         }
         usagesCount++;
         return url;
