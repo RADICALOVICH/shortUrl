@@ -10,6 +10,7 @@ public class ShortLink {
     private int maxUsages;
     private int usagesCount;
     private final LocalDateTime createdAt;
+
     private LocalDateTime expiredAt;
 
     public ShortLink(String url, String shortId, UUID ownerId, int maxUsages, int expirationHours) {
@@ -24,6 +25,18 @@ public class ShortLink {
 
     public UUID getOwnerId() {
         return ownerId;
+    }
+
+    public int getUsagesCount() {
+        return usagesCount;
+    }
+
+    public int getMaxUsages() {
+        return maxUsages;
+    }
+
+    public LocalDateTime getExpiredAt() {
+        return expiredAt;
     }
 
     public String getShortId() {
