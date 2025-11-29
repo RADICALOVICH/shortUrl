@@ -128,7 +128,7 @@ public class Main {
         System.out.println("  > You'll get a short ID (e.g., aB3dEf9K)");
         AppConfig config = new AppConfig();
         System.out.println("  > Default: " + config.getDefaultMaxUsages() + " max usages, " +
-                          config.getDefaultTtlHours() + " hours TTL");
+            config.getDefaultTtlHours() + " hours TTL");
         System.out.println();
         System.out.println("Opening a link:");
         System.out.println("  > Choose option 4");
