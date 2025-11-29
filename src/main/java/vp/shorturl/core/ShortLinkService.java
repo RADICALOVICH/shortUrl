@@ -74,10 +74,13 @@ public class ShortLinkService {
 
         for (ShortLink link : allLinks) {
             if (link.isExpired()) {
+                System.out.println("[INFO] Auto-delete: link " + link.getShortId() +
+                        " was removed because TTL expired.");
                 shortLinkRepository.deleteByShortId(link.getShortId());
             }
         }
     }
+
 
     private String generateUniqueShortId() {
         String id;

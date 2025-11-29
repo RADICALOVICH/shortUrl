@@ -32,10 +32,10 @@ public class ShortLink {
 
     public String getUrl() {
         if (LocalDateTime.now().isAfter(expiredAt)) {
-            throw new IllegalStateException("Link expired");
+            throw new IllegalStateException("Link expired: TTL has ended. Link is no longer available.");
         }
         if (this.usagesCount >= this.maxUsages) {
-            throw new IllegalStateException("Usage limit reached");
+            throw new IllegalStateException("Link usage limit reached. No more transitions allowed.");
         }
         usagesCount++;
         return url;
