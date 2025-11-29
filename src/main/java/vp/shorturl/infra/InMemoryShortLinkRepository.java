@@ -2,7 +2,6 @@ package vp.shorturl.infra;
 
 import vp.shorturl.core.ShortLink;
 import vp.shorturl.core.ShortLinkRepository;
-import vp.shorturl.core.User;
 
 import java.util.*;
 
